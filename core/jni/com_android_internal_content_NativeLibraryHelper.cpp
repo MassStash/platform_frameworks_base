@@ -22,6 +22,7 @@
 #include <utils/Log.h>
 #include <androidfw/ZipFileRO.h>
 #include <ScopedUtfChars.h>
+#include <androidfw/ZipFileRO.h>
 
 #include <zlib.h>
 

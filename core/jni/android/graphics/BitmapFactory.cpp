@@ -18,7 +18,6 @@
 #include "GraphicsJNI.h"
 
 #include <android_runtime/AndroidRuntime.h>
-#include <cutils/properties.h>
 #include <androidfw/Asset.h>
 #include <androidfw/ResourceTypes.h>
 #include <netinet/in.h>
