@@ -1,18 +1,94 @@
-    /*
-     * Copyright (C) 2006 The Android Open Source Project
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *      http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+/*
+ * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.android.server;
+
+import android.app.ActivityManagerNative;
+import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.IPackageManager;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.media.AudioService;
+import android.net.wifi.p2p.WifiP2pService;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.StrictMode;
+import android.os.SystemClock;
+import android.os.SystemProperties;
+import android.os.UserHandle;
+import android.service.dreams.DreamService;
+import android.util.DisplayMetrics;
+import android.util.EventLog;
+import android.util.Log;
+import android.util.Slog;
+import android.view.WindowManager;
+
+import com.android.internal.R;
+import com.android.internal.os.BinderInternal;
+import com.android.internal.os.SamplingProfilerIntegration;
+import com.android.server.accessibility.AccessibilityManagerService;
+import com.android.server.accounts.AccountManagerService;
+import com.android.server.am.ActivityManagerService;
+import com.android.server.am.BatteryStatsService;
+import com.android.server.content.ContentService;
+import com.android.server.display.DisplayManagerService;
+import com.android.server.dreams.DreamManagerService;
+import com.android.server.input.InputManagerService;
+import com.android.server.net.NetworkPolicyManagerService;
+import com.android.server.net.NetworkStatsService;
+import com.android.server.os.SchedulingPolicyService;
+import com.android.server.pm.Installer;
+import com.android.server.pm.PackageManagerService;
+import com.android.server.pm.UserManagerService;
+import com.android.server.power.PowerManagerService;
+import com.android.server.power.ShutdownThread;
+import com.android.server.print.PrintManagerService;
+import com.android.server.search.SearchManagerService;
+import com.android.server.usb.UsbService;
+import com.android.server.wifi.WifiService;
+import com.android.server.wm.WindowManagerService;
+
+import dalvik.system.VMRuntime;
+import dalvik.system.Zygote;
+
+import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
+
+class ServerThread {
+    private static final String TAG = "SystemServer";
+    private static final String ENCRYPTING_STATE = "trigger_restart_min_framework";
+    private static final String ENCRYPTED_STATE = "1";
+
+    ContentResolver mContentResolver;
+
+    void reportWtf(String msg, Throwable e) {
+        Slog.w(TAG, "***********************************************");
+        Log.wtf(TAG, "BOOT FAILURE " + msg, e);
+    }
 
     package com.android.server;
 
@@ -874,6 +950,28 @@
                 ActivityManagerService.self().showSafeModeOverlay();
             }
 
+            try {
+                Slog.i(TAG, "AssetRedirectionManager Service");
+                ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
+            } catch (Throwable e) {
+                Slog.e(TAG, "Failure starting AssetRedirectionManager Service", e);
+            }
+        }
+
+        // Before things start rolling, be sure we have decided whether
+        // we are in safe mode.
+        final boolean safeMode = wm.detectSafeMode();
+        if (safeMode) {
+            ActivityManagerService.self().enterSafeMode();
+            // Post the safe mode state in the Zygote class
+            Zygote.systemInSafeMode = true;
+            // Disable the JIT for the system_server process
+            VMRuntime.getRuntime().disableJitCompilation();
+        } else {
+            // Enable the JIT for the system_server process
+            VMRuntime.getRuntime().startJitCompilation();
+        }
+
             // Update the configuration for this context by hand, because we're going
             // to start using it before the config change done in wm.systemReady() will
             // propagate to it.
@@ -1004,8 +1102,51 @@
                     }
                     Watchdog.getInstance().start();
 
-                    // It is now okay to let the various system services start their
-                    // third party code...
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
+        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE_RESET);
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addCategory(Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE);
+        filter.addDataScheme("package");
+        context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
+
+        // These are needed to propagate to the runnable below.
+        final Context contextF = context;
+        final MountService mountServiceF = mountService;
+        final BatteryService batteryF = battery;
+        final NetworkManagementService networkManagementF = networkManagement;
+        final NetworkStatsService networkStatsF = networkStats;
+        final NetworkPolicyManagerService networkPolicyF = networkPolicy;
+        final ConnectivityService connectivityF = connectivity;
+        final DockObserver dockF = dock;
+        final UsbService usbF = usb;
+        final TwilightService twilightF = twilight;
+        final UiModeManagerService uiModeF = uiMode;
+        final AppWidgetService appWidgetF = appWidget;
+        final WallpaperManagerService wallpaperF = wallpaper;
+        final InputMethodManagerService immF = imm;
+        final RecognitionManagerService recognitionF = recognition;
+        final LocationManagerService locationF = location;
+        final CountryDetectorService countryDetectorF = countryDetector;
+        final NetworkTimeUpdateService networkTimeUpdaterF = networkTimeUpdater;
+        final CommonTimeManagementService commonTimeMgmtServiceF = commonTimeMgmtService;
+        final TextServicesManagerService textServiceManagerServiceF = tsms;
+        final StatusBarManagerService statusBarF = statusBar;
+        final DreamManagerService dreamyF = dreamy;
+        final AssetAtlasService atlasF = atlas;
+        final InputManagerService inputManagerF = inputManager;
+        final TelephonyRegistry telephonyRegistryF = telephonyRegistry;
+        final PrintManagerService printManagerF = printManager;
+
+        // We now tell the activity manager it is okay to run third party
+        // code.  It will call back into us once it has gotten to the state
+        // where third party code can really run (but before it has actually
+        // started launching the initial applications), for us to complete our
+        // initialization.
+        ActivityManagerService.self().systemReady(new Runnable() {
+            public void run() {
+                Slog.i(TAG, "Making services ready");
 
                     try {
                         if (appWidgetF != null) appWidgetF.systemRunning(safeMode);
