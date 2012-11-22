@@ -3552,6 +3552,14 @@ public final class Settings {
         public static final String SIP_ASK_ME_EACH_TIME = "SIP_ASK_ME_EACH_TIME";
 
        /**
+        * Boolean value whether to allow the statusbar to be used as a
+        * brightness slider when collapsed
+        *
+        * @hide
+        */
+        public static final String STATUSBAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
+
+       /**
         * Sets the portrait background of notification drawer
         * @hide
         */
