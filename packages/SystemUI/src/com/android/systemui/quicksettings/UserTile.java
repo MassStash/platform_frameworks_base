@@ -15,6 +15,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.os.UserHandle;
@@ -40,7 +42,9 @@ import com.android.systemui.statusbar.phone.QuickSettingsController;
 public class UserTile extends QuickSettingsTile {
 
     private static final String TAG = "UserTile";
+
     private static final String INTENT_EXTRA_NEW_LOCAL_PROFILE = "newLocalProfile";
+
     private Drawable userAvatar;
     private AsyncTask<Void, Void, Pair<String, Drawable>> mUserInfoTask;
 
@@ -67,12 +71,16 @@ public class UserTile extends QuickSettingsTile {
                     }
                     cursor.close();
                 } else {
+                if (um.getUsers(true).size() > 1) {
                     try {
                         WindowManagerGlobal.getWindowManagerService().lockNow(
                                 null);
                     } catch (RemoteException e) {
                         Log.e(TAG, "Couldn't show user switcher", e);
                     }
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, ContactsContract.Profile.CONTENT_URI);
+                    startSettingsActivity(intent);
                 }
             }
         };
@@ -107,6 +115,7 @@ public class UserTile extends QuickSettingsTile {
                 tv.setTextColor(mTileTextColor);
             }
         }
+        tv.setText(mLabel);
         iv.setImageDrawable(userAvatar);
     }
 
@@ -133,6 +142,7 @@ public class UserTile extends QuickSettingsTile {
                 try {
                     // The system needs some time to change the picture,
                     // if we try to load it when we receive the broadcast, we will load the old one
+                    // The system needs some time to change the picture, if we try to load it when we receive the broadcast, we will load the old one
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -143,12 +153,25 @@ public class UserTile extends QuickSettingsTile {
                 String name = null;
                 Drawable avatar = null;
                 String id = null;
+
+                // Fall back to the UserManager nickname if we can't read the name from the local
+                // profile below.
+                String name = userName;
+                Drawable avatar = null;
+                Bitmap rawAvatar = um.getUserIcon(userId);
+                if (rawAvatar != null) {
+                    avatar = new BitmapDrawable(mContext.getResources(), rawAvatar);
+                } else {
+                    avatar = mContext.getResources().getDrawable(R.drawable.ic_qs_default_user);
+                }
+
                 // If it's a single-user device, get the profile name, since the nickname is not
                 // usually valid
                 if (um.getUsers().size() <= 1) {
                     // Try and read the display name from the local profile
                     final Cursor cursor = context.getContentResolver().query(
                             Profile.CONTENT_URI, new String[] {Phone.PHOTO_FILE_ID, Phone.DISPLAY_NAME},
+                            Profile.CONTENT_URI, new String[] {Phone._ID, Phone.DISPLAY_NAME},
                             null, null, null);
                     if (cursor != null) {
                         try {
@@ -159,6 +182,7 @@ public class UserTile extends QuickSettingsTile {
                         } finally {
                             cursor.close();
                         }
+
                         // Fall back to the UserManager nickname if we can't read the name from the local
                         // profile below.
                         if (name == null) {
