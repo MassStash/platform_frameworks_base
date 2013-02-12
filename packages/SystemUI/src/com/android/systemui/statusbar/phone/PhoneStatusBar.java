@@ -998,7 +998,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
         updateBatteryIcons();
 
+
         mVelocityTracker = VelocityTracker.obtain();
+
+        mNetworkController.setListener(this);
 
         return mStatusBarView;
     }
@@ -1481,6 +1484,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mNotificationIcons.addView(v, i, params);
             }
         }
+    }
+
+    /**
+     * Listen for UI updates and refresh layout.
+     */
+    public void onUpdateUI() {
+        updateCarrierAndWifiLabelVisibility(true);
     }
 
     protected void updateCarrierAndWifiLabelVisibility(boolean force) {
