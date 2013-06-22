@@ -781,6 +781,17 @@
                         reportWtf("starting DreamManagerService", e);
                     }
                 }
+                
+            if (!disableNonCoreServices) { 
+            if (context.getResources().getBoolean(
+                    com.android.internal.R.bool.config_enableIrdaManagerService)) {
+                try {
+                    Slog.i(TAG, "IrdaManager Service");
+                    ServiceManager.addService("irda", new IrdaManagerService(context));
+                } catch (Throwable e) {
+                    Slog.e(TAG, "Failure starting Irda Service", e);
+                }
+            }
 
                 if (!disableNonCoreServices) {
                     try {
@@ -862,7 +873,8 @@
                 } catch (Throwable e) {
                     reportWtf("making Notification Service ready", e);
                 }
-            }
+             }
+            
 
             try {
                 wm.systemReady();
