@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
  * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
+ * Copyright (c) 2012, 2013. The Linux Foundation. All rights reserved.
+ * Not a Contribution.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,6 +236,7 @@ class ServerThread {
             InputManagerService inputManager = null;
             TelephonyRegistry telephonyRegistry = null;
             ConsumerIrService consumerIr = null;
+            MSimTelephonyRegistry msimTelephonyRegistry = null;
 
             // Create a handler thread just for the window manager to enjoy.
             HandlerThread wmHandlerThread = new HandlerThread("WindowManager");
@@ -333,7 +336,17 @@ class ServerThread {
                 ServiceManager.addService(Context.USER_SERVICE,
                         UserManagerService.getInstance());
 
+
                 mContentResolver = context.getContentResolver();
+
+            if (android.telephony.MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+                Slog.i(TAG, "MSimTelephony Registry");
+                msimTelephonyRegistry = new MSimTelephonyRegistry(context);
+                ServiceManager.addService("telephony.msim.registry", msimTelephonyRegistry);
+            }
+
+            Slog.i(TAG, "Scheduling Policy");
+            ServiceManager.addService("scheduling_policy", new SchedulingPolicyService());
 
                 // The AccountManager must come before the ContentService
                 try {
@@ -1177,6 +1190,7 @@ class ServerThread {
         final AssetAtlasService atlasF = atlas;
         final InputManagerService inputManagerF = inputManager;
         final TelephonyRegistry telephonyRegistryF = telephonyRegistry;
+        final MSimTelephonyRegistry msimTelephonyRegistryF = msimTelephonyRegistry;
         final PrintManagerService printManagerF = printManager;
 
         // We now tell the activity manager it is okay to run third party
@@ -1253,6 +1267,12 @@ class ServerThread {
                     }
 
                     try {
+                    if (msimTelephonyRegistryF != null) msimTelephonyRegistryF.systemRunning();
+                    } catch (Throwable e) {
+                        reportWtf("Notifying TelephonyRegistry running", e);
+                    }
+
+                try {
                         if (printManagerF != null) printManagerF.systemRuning();
                     } catch (Throwable e) {
                         reportWtf("Notifying PrintManagerService running", e);
