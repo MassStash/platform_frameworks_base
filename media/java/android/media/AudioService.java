@@ -1149,7 +1149,7 @@ public class AudioService extends IAudioService.Stub {
         return delta;
     }
 
-    private void sendBroadcastToAll(Intent intent) {
+    protected void sendBroadcastToAll(Intent intent) {
         final long ident = Binder.clearCallingIdentity();
         try {
             mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
