@@ -1588,7 +1588,20 @@ class AlarmManagerService extends IAlarmManager.Stub {
                 } else {
                     mLog.w("No in-flight alarm for " + pi + " " + intent);
                 }
-                mTriggeredUids.remove(new Integer(uid));
+
+                String pkg = null;
+                int uid = 0;
+                try {
+                    pkg = pi.getTargetPackage();
+                    final PackageManager pm = mContext.getPackageManager();
+                    ApplicationInfo appInfo =
+                        pm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
+                    uid = appInfo.uid;
+                    mTriggeredUids.remove(new Integer(uid));
+                } catch (PackageManager.NameNotFoundException ex) {
+                    Slog.w(TAG, "onSendFinished NameNotFoundException Pkg = " + pkg);
+                }
+
                 if(mBlockedUids.contains(new Integer(uid))) {
                     mBlockedUids.remove(new Integer(uid));
                 } else {
