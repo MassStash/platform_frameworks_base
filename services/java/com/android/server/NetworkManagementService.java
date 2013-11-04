@@ -465,6 +465,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
         @Override
         public boolean onEvent(int code, String raw, String[] cooked) {
+            String errorMessage = String.format("Invalid event from daemon (%s)", raw);
             switch (code) {
             case NetdResponseCode.InterfaceChange:
                     /*
@@ -475,8 +476,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                      *         "NNN Iface linkstatus <name> <up/down>"
                      */
                     if (cooked.length < 4 || !cooked[1].equals("Iface")) {
-                        throw new IllegalStateException(
-                                String.format("Invalid event from daemon (%s)", raw));
+                        throw new IllegalStateException(errorMessage);
                     }
                     if (cooked[2].equals("added")) {
                         notifyInterfaceAdded(cooked[3]);
@@ -491,8 +491,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                         notifyInterfaceLinkStateChanged(cooked[3], cooked[4].equals("up"));
                         return true;
                     }
-                    throw new IllegalStateException(
-                            String.format("Invalid event from daemon (%s)", raw));
+                    throw new IllegalStateException(errorMessage);
                     // break;
             case NetdResponseCode.BandwidthControl:
                     /*
@@ -500,15 +499,13 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                      * Format: "NNN limit alert <alertName> <ifaceName>"
                      */
                     if (cooked.length < 5 || !cooked[1].equals("limit")) {
-                        throw new IllegalStateException(
-                                String.format("Invalid event from daemon (%s)", raw));
+                        throw new IllegalStateException(errorMessage);
                     }
                     if (cooked[2].equals("alert")) {
                         notifyLimitReached(cooked[3], cooked[4]);
                         return true;
                     }
-                    throw new IllegalStateException(
-                            String.format("Invalid event from daemon (%s)", raw));
+                    throw new IllegalStateException(errorMessage);
                     // break;
             case NetdResponseCode.InterfaceClassActivity:
                     /*
@@ -516,8 +513,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                      * Format: "NNN IfaceClass <active/idle> <label>"
                      */
                     if (cooked.length < 4 || !cooked[1].equals("IfaceClass")) {
-                        throw new IllegalStateException(
-                                String.format("Invalid event from daemon (%s)", raw));
+                        throw new IllegalStateException(errorMessage);
                     }
                     boolean isActive = cooked[2].equals("active");
                     notifyInterfaceClassActivity(cooked[3], isActive);
@@ -529,9 +525,8 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                      * Format: "NNN Address updated <addr> <iface> <flags> <scope>"
                      *         "NNN Address removed <addr> <iface> <flags> <scope>"
                      */
-                    String msg = String.format("Invalid event from daemon (%s)", raw);
-                    if (cooked.length < 6 || !cooked[1].equals("Address")) {
-                        throw new IllegalStateException(msg);
+                    if (cooked.length < 7 || !cooked[1].equals("Address")) {
+                        throw new IllegalStateException(errorMessage);
                     }
 
                     int flags;
@@ -540,7 +535,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
                         flags = Integer.parseInt(cooked[5]);
                         scope = Integer.parseInt(cooked[6]);
                     } catch(NumberFormatException e) {
-                        throw new IllegalStateException(msg);
+                        throw new IllegalStateException(errorMessage);
                     }
 
                     if (cooked[2].equals("updated")) {
