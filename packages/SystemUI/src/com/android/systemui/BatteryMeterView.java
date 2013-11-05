@@ -89,6 +89,7 @@ public class BatteryMeterView extends View implements DemoMode {
     private final RectF mButtonFrame = new RectF();
     private final RectF mClipFrame = new RectF();
     private final RectF mBoltFrame = new RectF();
+<<<<<<< HEAD
 
     private int mBatteryStyle;
     private int mBatteryColor;
@@ -106,6 +107,8 @@ public class BatteryMeterView extends View implements DemoMode {
     private int mPercentageChargingColor;
     private boolean mPercentageOnly = false;
     private String mBatteryTypeView;
+=======
+>>>>>>> d8595fd... Battery icon tweaks.
 
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
