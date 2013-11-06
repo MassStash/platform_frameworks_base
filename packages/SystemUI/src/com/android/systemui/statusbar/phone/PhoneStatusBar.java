@@ -326,6 +326,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     CustomTheme mCurrentTheme;
     private boolean mRecreating = false;
 
+    // last theme that was applied in order to detect theme change (as opposed
+    // to some other configuration change).
+    CustomTheme mCurrentTheme;
+    private boolean mRecreating = false;
+
     // for disabling the status bar
     int mDisabled = 0;
     boolean mDisableHomeLongpress;
@@ -820,6 +825,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             public boolean onTouch(View v, MotionEvent event) {
                 checkUserAutohide(v, event);
                 return false;
+
             }
         });
 
@@ -3402,8 +3408,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // recreate notifications.
         for (int i = 0; i < nNotifs; i++) {
             Pair<IBinder, StatusBarNotification> notifData = notifications.get(i);
-
-            addNotificationViews(notifData.first, notifData.second);
+            addNotificationViews(createNotificationViews(notifData.first, notifData.second));
         }
 
         setAreThereNotifications();
@@ -3411,7 +3416,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mStatusBarContainer.addView(mStatusBarWindow);
 
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
+
         restorePieTriggerMask();
+
         mRecreating = false;
     }
 
