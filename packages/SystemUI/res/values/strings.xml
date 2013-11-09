@@ -509,4 +509,8 @@
 
     <string name="accessibility_data_connection_HP">HSPA+</string>
 
+
+    <!--ScreenShot Trash-->
+    <string name="screenshot_notification_delete">Delete</string>
+
 </resources>
