@@ -24,3 +24,5 @@ package android.print;
 oneway interface IPrintDocumentAdapterObserver {
     void onDestroy();
 }
+
+parcelable Profile;
