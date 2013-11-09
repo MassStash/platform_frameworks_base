@@ -4271,6 +4271,17 @@ public final class Settings {
         public static final String SCREEN_RECORDER_RECORD_AUDIO = "screen_recorder_record_audio";
 
         /**
+         * Custom navring actions
+         *
+         * @hide
+         */
+        public static final String[] NAVIGATION_RING_TARGETS = new String[] {
+            "navigation_ring_targets_0",
+            "navigation_ring_targets_1",
+            "navigation_ring_targets_2",
+        };
+
+        /**
          * Electronic beam animation mode
          * 0 = off,
          * 1 = always horizontal,
