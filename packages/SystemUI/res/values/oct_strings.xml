@@ -108,4 +108,7 @@
     
     <!-- Torch tile -->
     <string name="quick_settings_torch_label">Torch</string>
+
+    <!--ScreenShot Trash-->
+    <string name="screenshot_notification_delete">Delete</string>
 </resources>
