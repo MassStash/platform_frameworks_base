@@ -2972,6 +2972,13 @@ public final class Settings {
 
         /**
          * Whether the lockscreen should be completely disabled.
+         * Whether the power menu immersive is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_IMMERSIVE_ENABLED = "power_menu_immersive_enabled";
+
+        /**
+         * Whether power menu screenshot is enabled
          * @hide
          */
         public static final String LOCKSCREEN_DISABLED = "lockscreen.disabled";
@@ -3099,8 +3106,20 @@ public final class Settings {
         public static final String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
 
         /**
+<<<<<<< HEAD
          * The reverse lookup provider
          *
+=======
+         * Immersive mode global actions switch
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
+        public static final String IMMERSIVE_MODE = "immersive_mode";
+
+        /**
+         * Weather to minimize lockscreen challenge on screen turned on
+>>>>>>> b639605... Immersive mode
          * @hide
          */
         public static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";

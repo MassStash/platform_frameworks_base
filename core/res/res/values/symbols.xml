@@ -1763,6 +1763,7 @@
   <java-symbol type="dimen" name="subtitle_shadow_offset" />
   <java-symbol type="dimen" name="subtitle_outline_width" />
 
+<<<<<<< HEAD
   <!-- Telephony -->
   <java-symbol type="bool" name="config_smsSamsungCdmaAlternateMessageIDEncoding" />
   <java-symbol type="bool" name="config_samsung_stk" />
@@ -1780,6 +1781,8 @@
   <java-symbol type="bool" name="config_wifiApStartInterface" />
 
   <java-symbol type="bool" name="use_motion_accel" />
+=======
+>>>>>>> b639605... Immersive mode
 
   <java-symbol type="bool" name="config_wifiApFirmwareReload" />
 </resources>
