@@ -3087,6 +3087,12 @@ public final class Settings {
          */
         public static final String POWER_MENU_SILENT_ENABLED = "power_menu_silent_enabled";
 		
+		/**
+         * Whether the power menu immersive is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_IMMERSIVE_ENABLED = "power_menu_immersive_enabled"
+		
 	    /**
          * QuickSettings music tile mode
          * @hide
@@ -3301,6 +3307,14 @@ public final class Settings {
           * @hide
           */
          public static final String KEY_APP_SWITCH_ACTION = "key_app_switch_action";
+
+        /**
+         * Immersive mode global actions switch
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
+        public static final String IMMERSIVE_MODE = "immersive_mode";
 
          /**
           * Action to perform when the app switch key is long-pressed. (Default is 0)
