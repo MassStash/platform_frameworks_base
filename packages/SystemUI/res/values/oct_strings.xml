@@ -109,4 +109,5 @@
 
     <!--ScreenShot Trash-->
     <string name="screenshot_notification_delete">Delete</string>
+
 </resources>

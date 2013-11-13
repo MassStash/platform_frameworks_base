@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.TypedValue;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -108,7 +110,11 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
         if (mBatteryLevel == 100) {
             mLabel = mContext.getString(R.string.quick_settings_battery_charged_label);
         } else {
+
             if (!batteryHasPercent) {
+
+            if (!mBatteryHasPercent) {
+
                 mLabel = mPluggedIn
                     ? mContext.getString(R.string.quick_settings_battery_charging_label,
                             mBatteryLevel)
@@ -122,8 +128,28 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
         }
     }
 
+    public void updateBattery() {
+        if (mBattery == null || mCircleBattery == null) {
+            return;
+
+        }
+        mCircleBattery.updateSettings();
+        mBattery.updateSettings();
+        int batteryStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.STATUS_BAR_BATTERY, 0, UserHandle.USER_CURRENT);
+        mBatteryHasPercent = batteryStyle == BatteryMeterView.BATTERY_STYLE_ICON_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_CIRCLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT;
+    }
+
     @Override
     void updateQuickSettings() {
+        mBattery = (BatteryMeterView) mTile.findViewById(R.id.image);
+        mBattery.setVisibility(View.GONE);
+        mCircleBattery = (BatteryCircleMeterView) mTile.findViewById(R.id.circle_battery);
+        updateBattery();
+
         TextView tv = (TextView) mTile.findViewById(R.id.text);
         if (tv != null) {
             tv.setText(mLabel);

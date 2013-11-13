@@ -95,9 +95,6 @@ public class BatteryCircleMeterView extends ImageView {
     private int mCircleTextChargingColor;
     private int mCircleAnimSpeed;
 
-    private boolean mCustomColor;
-    private int systemColor;
-
     // runnable to invalidate view via mHandler.postDelayed() call
     private final Runnable mInvalidate = new Runnable() {
         public void run() {
@@ -263,6 +260,7 @@ public class BatteryCircleMeterView extends ImageView {
                 } else {
                     mPaintFont.setColor(mCircleTextColor);
                 }
+                mPaintFont.setColor(mCircleTextColor);
             }
             canvas.drawText(Integer.toString(level), textX, mTextY, mPaintFont);
         }
@@ -369,6 +367,7 @@ public class BatteryCircleMeterView extends ImageView {
         } else {
             mPaintSystem.setColor(mCircleColor);
         }
+        mPaintSystem.setColor(mCircleColor);
         // could not find the darker definition anywhere in resources
         // do not want to use static 0x404040 color value. would break theming.
         mPaintGray.setColor(res.getColor(R.color.darker_gray));

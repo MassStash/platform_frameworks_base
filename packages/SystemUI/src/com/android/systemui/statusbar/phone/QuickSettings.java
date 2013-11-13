@@ -60,7 +60,6 @@ import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.android.internal.app.MediaRouteDialogPresenter;
 import com.android.systemui.BatteryMeterView;
 import com.android.systemui.BatteryCircleMeterView;

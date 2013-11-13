@@ -329,6 +329,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private boolean mCustomColor;
     private int systemColor;
 
+    BatteryTile mQSB;
+    private BatteryMeterView mBattery;
+    private BatteryCircleMeterView mCircleBattery;
+
     // XXX: gesture research
     private final GestureRecorder mGestureRec = DEBUG_GESTURES
         ? new GestureRecorder("/sdcard/statusbar_gestures.dat")
@@ -477,6 +481,15 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void updateBatteryIcons() {
+
+            updateBatteryIcons();
+        }
+    }
+
+    private void updateBatteryIcons() {
+        if (mQSB != null) {
+            mQSB.updateBattery();
+        }
         if (mBattery != null && mCircleBattery != null) {
             mBattery.updateSettings();
             mCircleBattery.updateSettings();
@@ -980,6 +993,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         resetUserSetupObserver();
 
         mNetworkController.setListener(this);
+
         mBattery = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
         updateBatteryIcons();

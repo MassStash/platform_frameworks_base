@@ -100,6 +100,13 @@ public class BatteryMeterView extends View implements DemoMode {
     private boolean mCustomColor;
     private int systemColor;
 
+    private int mBatteryStyle;
+    private int mBatteryColor;
+    private int mPercentageColor;
+    private int mPercentageChargingColor;
+    private boolean mPercentageOnly = false;
+    private String mBatteryTypeView;
+
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
 
@@ -467,6 +474,7 @@ public class BatteryMeterView extends View implements DemoMode {
                 height = metrics.density * 16f + 0.5f;
                 if (mBatteryStyle == BATTERY_STYLE_PERCENT) {
                     width = metrics.density * 38f + 0.5f;
+                    width = metrics.density * 35f + 0.5f;
                 } else {
                     width = metrics.density * 10.5f + 0.5f;
                 }
@@ -482,6 +490,8 @@ public class BatteryMeterView extends View implements DemoMode {
                 }
                 lp = new LinearLayout.LayoutParams((int) width, (int) height);
                 lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+                lp.setMargins(0, res.getDimensionPixelSize(R.dimen.qs_tile_margin_above_icon),
+                    0, res.getDimensionPixelSize(R.dimen.qs_tile_margin_below_icon));
                 setLayoutParams(lp);
             }
 
@@ -525,6 +535,9 @@ public class BatteryMeterView extends View implements DemoMode {
                 mBatteryPaint.setColor(DevUtils.extractRGB(mBatteryColor) | OPAQUE_MASK);
                 mFramePaint.setColor(DevUtils.extractRGB(mBatteryColor) | FRAME_MASK);
             }
+
+            mBatteryPaint.setColor(mBatteryColor);
+
         }
 
         if (tracker.plugged) {
@@ -541,10 +554,14 @@ public class BatteryMeterView extends View implements DemoMode {
             }
             mTextPaint.setColor(mBoltPaint.getColor());
         } else {
+
             if (tracker.level <= 14 && (mBatteryStyle == BATTERY_STYLE_PERCENT
                     || mBatteryStyle == BATTERY_STYLE_ICON_PERCENT)) {
                 mTextPaint.setColor(Color.RED);
             } else if (mPercentageColor == -2) {
+
+            if (mPercentageColor == -2) {
+
                 if (mBatteryStyle == BATTERY_STYLE_ICON_PERCENT) {
                     mTextPaint.setColor(mContext.getResources().getColor(
                             R.color.batterymeter_bolt_color));
@@ -553,11 +570,15 @@ public class BatteryMeterView extends View implements DemoMode {
                             R.color.batterymeter_charge_color));
                 }
             } else {
+
 //                if (mCustomColor) {
 //                    mTextPaint.setColor(systemColor);
 //                } else {
                     mTextPaint.setColor(mPercentageColor);
 //                }
+
+                mTextPaint.setColor(mPercentageColor);
+
             }
         }
         postInvalidate();
