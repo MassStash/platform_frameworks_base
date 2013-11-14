@@ -1603,4 +1603,10 @@ public class ActiveDisplayView extends FrameLayout
         mPrivacyApps = new HashSet<String>(Arrays.asList(appsToExclude));
     }
 
+    private boolean getPowerButtonInstantlyLocks() {
+        LockPatternUtils utils = new LockPatternUtils(mContext);
+        utils.setCurrentUser(UserHandle.USER_OWNER);
+        return utils.getPowerButtonInstantlyLocks();
+    }
+
 }
