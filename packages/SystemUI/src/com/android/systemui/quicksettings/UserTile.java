@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.os.UserHandle;
@@ -42,9 +43,7 @@ import com.android.systemui.statusbar.phone.QuickSettingsController;
 public class UserTile extends QuickSettingsTile {
 
     private static final String TAG = "UserTile";
-
     private static final String INTENT_EXTRA_NEW_LOCAL_PROFILE = "newLocalProfile";
-
     private Drawable userAvatar;
     private AsyncTask<Void, Void, Pair<String, Drawable>> mUserInfoTask;
 
@@ -71,16 +70,12 @@ public class UserTile extends QuickSettingsTile {
                     }
                     cursor.close();
                 } else {
-                if (um.getUsers(true).size() > 1) {
                     try {
                         WindowManagerGlobal.getWindowManagerService().lockNow(
                                 null);
                     } catch (RemoteException e) {
                         Log.e(TAG, "Couldn't show user switcher", e);
                     }
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, ContactsContract.Profile.CONTENT_URI);
-                    startSettingsActivity(intent);
                 }
             }
         };
@@ -148,18 +143,6 @@ public class UserTile extends QuickSettingsTile {
                 String name = null;
                 Drawable avatar = null;
                 String id = null;
-
-                // Fall back to the UserManager nickname if we can't read the name from the local
-                // profile below.
-                String name = userName;
-                Drawable avatar = null;
-                Bitmap rawAvatar = um.getUserIcon(userId);
-                if (rawAvatar != null) {
-                    avatar = new BitmapDrawable(mContext.getResources(), rawAvatar);
-                } else {
-                    avatar = mContext.getResources().getDrawable(R.drawable.ic_qs_default_user);
-                }
-
                 // If it's a single-user device, get the profile name, since the nickname is not
                 // usually valid
                 if (um.getUsers().size() <= 1) {
@@ -172,7 +155,7 @@ public class UserTile extends QuickSettingsTile {
                         try {
                             if (cursor.moveToFirst()) {
                                 name = cursor.getString(cursor.getColumnIndex(Phone.DISPLAY_NAME));
-                                id = cursor.getString(cursor.getColumnIndex(Phone.PHOTO_FILE_ID));
+                                id = cursor.getString(cursor.getColumnIndex(Phone._ID));
                             }
                         } finally {
                             cursor.close();
@@ -187,8 +170,9 @@ public class UserTile extends QuickSettingsTile {
                             Bitmap rawAvatar = null;
                             InputStream is = null;
                             try {
-                                Uri.Builder uriBuilder = ContactsContract.DisplayPhoto.CONTENT_URI.buildUpon();
+                                Uri.Builder uriBuilder = ContactsContract.RawContacts.CONTENT_URI.buildUpon();
                                 uriBuilder.appendPath(id);
+                                uriBuilder.appendPath(Contacts.Photo.DISPLAY_PHOTO);
                                 is = mContext.getContentResolver().openInputStream(uriBuilder.build());
                                 rawAvatar = BitmapFactory.decodeStream(is);
                                 avatar = new BitmapDrawable(mContext.getResources(), rawAvatar);
