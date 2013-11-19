@@ -1570,9 +1570,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mImmersiveModeConfirmation != null) {
                 mImmersiveModeConfirmation.loadSetting();
             }
-
-            mForceImmersiveMode = (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, 0) == 1);
         }
         if (updateRotation) {
             updateRotation(true);
@@ -3167,8 +3164,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     @Override
     public void getContentInsetHintLw(WindowManager.LayoutParams attrs, Rect contentInset) {
-        final int fl = updateWindowManagerVisibilityFlagsForImmersive(attrs.flags);
-        final int systemUiVisibility = updateSystemUiVisibilityFlagsForImmersive(
+        final int fl = updateWindowManagerVisibilityFlagsForExpandedDesktop(attrs.flags);
+        final int systemUiVisibility = updateSystemUiVisibilityFlagsForExpandedDesktop(
                 attrs.systemUiVisibility|attrs.subtreeSystemUiVisibility);
 
         if ((fl & (FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR))
@@ -3332,11 +3329,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                             - mNavigationBarHeightForRotation[displayRotation];
                     mTmpNavigationFrame.set(0, top, displayWidth, displayHeight - overscanBottom);
                     mStableBottom = mTmpNavigationFrame.top;
-                    if (!mForceImmersiveMode) {
+                    if (!expandedDesktopHidesNavigationBar()) {
                         mStableFullscreenBottom = mTmpNavigationFrame.top;
                     }
                     if (transientNavBarShowing
-                            || (navVisible && mForceImmersiveMode)) {
+                            || (navVisible && expandedDesktopHidesNavigationBar())) {
                         mNavigationBarController.setBarShowingLw(true);
                     } else if (navVisible) {
                         mNavigationBarController.setBarShowingLw(true);
@@ -3360,11 +3357,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                             - mNavigationBarWidthForRotation[displayRotation];
                     mTmpNavigationFrame.set(left, 0, displayWidth - overscanRight, displayHeight);
                     mStableRight = mTmpNavigationFrame.left;
-                    if (!mForceImmersiveMode) {
+                    if (!expandedDesktopHidesNavigationBar()) {
                         mStableFullscreenRight = mTmpNavigationFrame.left;
                     }
                     if (transientNavBarShowing
-                            || (navVisible && mForceImmersiveMode)) {
+                            || (navVisible && expandedDesktopHidesNavigationBar())) {
                         mNavigationBarController.setBarShowingLw(true);
                     } else if (navVisible) {
                         mNavigationBarController.setBarShowingLw(true);
@@ -3429,7 +3426,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // If the status bar is hidden, we don't want to cause
                 // windows behind it to scroll.
                 if (mStatusBar.isVisibleLw()
-                        && !statusBarTransient && !mForceImmersiveMode) {
+                        && !statusBarTransient && !expandedDesktopHidesStatusBar()) {
                     // Status bar may go away, so the screen area it occupies
                     // is available to apps but just covering them when the
                     // status bar is visible.
@@ -3450,7 +3447,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 if (mStatusBar.isVisibleLw() && !mStatusBar.isAnimatingLw()
                         && !statusBarTransient && !statusBarTranslucent
                         && !mStatusBarController.wasRecentlyTranslucent()
-                        && !mForceImmersiveMode) {
+                        && !expandedDesktopHidesStatusBar()) {
                     // If the opaque status bar is currently requested to be visible,
                     // and not in the process of animating on or off, then
                     // we can tell the app that it is covered by it.
@@ -3529,7 +3526,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     private void applyStableConstraints(int sysui, int fl, Rect r) {
-        fl = updateWindowManagerVisibilityFlagsForImmersive(fl);
+        fl = updateWindowManagerVisibilityFlagsForExpandedDesktop(fl);
         if ((sysui & View.SYSTEM_UI_FLAG_LAYOUT_STABLE) != 0) {
             // If app is requesting a stable layout, don't let the
             // content insets go below the stable values.
@@ -3565,7 +3562,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         final int fl = attrs.flags;
         final int sim = attrs.softInputMode;
-        final int sysUiFl = updateSystemUiVisibilityFlagsForImmersive(win.getSystemUiVisibility());
+        final int sysUiFl = updateSystemUiVisibilityFlagsForExpandedDesktop(win.getSystemUiVisibility());
 
         final Rect pf = mTmpParentFrame;
         final Rect df = mTmpDisplayFrame;
@@ -3938,16 +3935,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    private int updateSystemUiVisibilityFlagsForImmersive(int vis) {
-        if (mForceImmersiveMode) {
-            vis |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
+    private int updateSystemUiVisibilityFlagsForExpandedDesktop(int vis) {
+        if (expandedDesktopHidesNavigationBar()) {
+            vis |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+	}
+	if (expandedDesktopHidesStatusBar()) {
+       vis |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
         }
         return vis;
     }
 
-    private int updateWindowManagerVisibilityFlagsForImmersive(int vis) {
-        if (mForceImmersiveMode) {
+    private int updateWindowManagerVisibilityFlagsForExpandedDesktop(int vis) {
+        if (mExpandedDesktopStyle != 0) {
             vis |= FLAG_FULLSCREEN;
         }
         return vis;
@@ -4085,7 +4084,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + " forcefkg=" + mForceStatusBarFromKeyguard
                     + " top=" + mTopFullscreenOpaqueWindowState);
             if ((mForceStatusBar || mForceStatusBarFromKeyguard)
-                    && !mForceImmersiveMode) {
+                    && !expandedDesktopHidesStatusBar()) {
                 if (DEBUG_LAYOUT) Slog.v(TAG, "Showing status bar: forced");
                 if (mStatusBarController.setBarShowingLw(true)) {
                     changes |= FINISH_LAYOUT_REDO_LAYOUT;
@@ -5747,17 +5746,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         int tmpVisibility = win.getSystemUiVisibility()
                 & ~mResettingSystemUiFlags
                 & ~mForceClearedSystemUiFlags;
-        tmpVisibility = updateSystemUiVisibilityFlagsForImmersive(tmpVisibility);
+        tmpVisibility = updateSystemUiVisibilityFlagsForExpandedDesktop(tmpVisibility);
 
-        final boolean subWindowInImmersiveMode = mForceImmersiveMode
+        final boolean subWindowInExpandedMode = expandedDesktopHidesNavigationBar()
                 && (windowType >= WindowManager.LayoutParams.FIRST_SUB_WINDOW
-                        && windowType <= WindowManager.LayoutParams.LAST_SUB_WINDOW);
+                && windowType <= WindowManager.LayoutParams.LAST_SUB_WINDOW);
         final boolean wasCleared = mClearedBecauseOfForceShow;
         if (mForcingShowNavBar && (win.getSurfaceLayer() < mForcingShowNavBarLayer
-                || subWindowInImmersiveMode)) {
+                || subWindowInExpandedMode)) {
             int clearableFlags = View.SYSTEM_UI_CLEARABLE_FLAGS;
-            if (mForceImmersiveMode) {
+            if (expandedDesktopHidesStatusBar()) {
                 clearableFlags &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+			}
+			if (expandedDesktopHidesNavigationBar()) {
                 clearableFlags |= View.NAVIGATION_BAR_TRANSLUCENT;
             }
             tmpVisibility &= ~clearableFlags;
@@ -5810,9 +5811,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         WindowState transWin = mKeyguard != null && mKeyguard.isVisibleLw() && !mHideLockScreen
                 ? mKeyguard
                 : mTopFullscreenOpaqueWindowState;
-
-        if (!mForceImmersiveMode) {
+		if (!expandedDesktopHidesStatusBar()) {
             vis = mStatusBarController.applyTranslucentFlagLw(transWin, vis, oldVis);
+		}
+		if (!expandedDesktopHidesNavigationBar()) {
             vis = mNavigationBarController.applyTranslucentFlagLw(transWin, vis, oldVis);
         }
 
@@ -5869,7 +5871,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         boolean oldImmersiveMode = isImmersiveMode(oldVis);
         boolean newImmersiveMode = isImmersiveMode(vis);
         if (win != null && oldImmersiveMode != newImmersiveMode) {
-            final String pkg = mForceImmersiveMode ? "android" : win.getOwningPackage();
+            final String pkg = mExpandedDesktopStyle != 0 ? "android" : win.getOwningPackage();
             mImmersiveModeConfirmation.immersiveModeChanged(pkg, newImmersiveMode);
         }
 

@@ -2870,12 +2870,6 @@ public final class Settings {
          * @hide
          */
         public static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";
-		
-        /*
-         * Expanded desktop on/off state
-         * @hide
-         */
-        public static final String EXPANDED_DESKTOP_STATE = "expanded_desktop_state";
 
         /**
         * Notification Power Widget - Custom Torch Mode
@@ -3097,7 +3091,7 @@ public final class Settings {
          * Whether the power menu immersive is enabled
          * @hide
          */
-        public static final String POWER_MENU_IMMERSIVE_ENABLED = "power_menu_immersive_enabled"
+        public static final String POWER_MENU_IMMERSIVE_ENABLED = "power_menu_immersive_enabled";
 		
 	    /**
          * QuickSettings music tile mode
@@ -3325,6 +3319,34 @@ public final class Settings {
          * @hide
          */
         public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
+
+		/**
+         * Config for advanced power menu
+         *
+         * @hide
+         */
+        public static final String POWER_MENU_CONFIG = "power_menu_config";
+
+        /**
+         * Text color for advanced power menu
+         *
+         * @hide
+         */
+        public static final String POWER_MENU_TEXT_COLOR = "power_menu_text_color";
+
+        /**
+         * Icon color for advanced power menu
+         *
+         * @hide
+         */
+        public static final String POWER_MENU_ICON_COLOR = "power_menu_icon_color";
+
+        /**
+         * Icon color mode for advanced power menu
+         *
+         * @hide
+         */
+        public static final String POWER_MENU_ICON_COLOR_MODE = "power_menu_icon_color_mode";
 
          /**
           * Action to perform when the app switch key is long-pressed. (Default is 0)
@@ -5570,6 +5592,12 @@ public final class Settings {
          * @hide
          */
         public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
+		
+        /**
+         * Chamber on / off (custom setting shortcuts)
+         * @hide
+         */
+        public static final String CHAMBER_OF_SECRETS = "chamber_of_secrets";
 
         /**
          * Name of a package that the current user has explicitly allowed to see all of that

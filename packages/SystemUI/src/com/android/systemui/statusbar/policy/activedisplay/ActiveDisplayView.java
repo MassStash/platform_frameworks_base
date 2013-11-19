@@ -204,6 +204,9 @@ public class ActiveDisplayView extends FrameLayout
     private boolean mUseActiveDisplayContent = false;
     private boolean mBypassActiveDisplay = false;
     private int mPocketMode = POCKET_MODE_OFF;
+    private boolean mForceImmersiveMode = false;
+    private long mRedisplayTimeout = 0;
+    private float mInitialBrightness = 1f;
     private int mBrightnessMode = -1;
     private int mUserBrightnessLevel = -1;
     private int mMinimumBacklight;
