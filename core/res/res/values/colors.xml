@@ -206,8 +206,6 @@
     <color name="keyguard_avatar_frame_pressed_color">#ff35b5e5</color>
 
     <color name="accessibility_focus_highlight">#80ffff00</color>
-<<<<<<< HEAD
-=======
 	
     <color name="default_dialog_text_holo_dark">@android:color/background_holo_light</color>
     <color name="default_dialog_text_holo_light">@android:color/background_holo_dark</color>
@@ -237,5 +235,9 @@
 
     <color name="holo_yellow_dark">#ff8800</color>
     <color name="holo_purple_dark">#9933cc</color>
->>>>>>> e71bc8d... Implement "real" KitKat color scheme.
+
+    <!-- Power menu colors -->
+    <color name="power_menu_icon_default_color">#ffffffff</color>
+    <color name="power_menu_text_default_color">#ffffffff</color>
+
 </resources>
