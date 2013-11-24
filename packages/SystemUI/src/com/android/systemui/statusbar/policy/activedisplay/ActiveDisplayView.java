@@ -1023,6 +1023,7 @@ public class ActiveDisplayView extends FrameLayout
                 invalidate();
                 mGlowPadView.ping();
                 isUserActivity();
+                userActivity();
                 return;
             }
         }
