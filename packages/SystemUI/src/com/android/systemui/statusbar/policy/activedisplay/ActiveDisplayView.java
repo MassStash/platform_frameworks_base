@@ -642,14 +642,6 @@ public class ActiveDisplayView extends FrameLayout
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (mEnableDoubleTap) {
-            mDoubleTapGesture.onTouchEvent(event);
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
     protected void dispatchDraw(Canvas canvas) {
         int layer = 0;
         if (mIsInBrightLight && mSunlightModeEnabled) {
