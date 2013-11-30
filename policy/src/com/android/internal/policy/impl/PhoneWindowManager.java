@@ -315,8 +315,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Behavior of volbtn music controls
     boolean mVolBtnMusicControls;
     boolean mIsLongPress;
-    private boolean mAnimatingWindows;
-    private boolean mNeedUpdateSettings;
 
     private boolean mClearedBecauseOfForceShow;
 
