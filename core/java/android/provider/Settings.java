@@ -3434,6 +3434,12 @@ public final class Settings {
         */
         public static final String NOTIFICATION_BACKGROUND_ALPHA = "notification_background_alpha";
 
+       /**
+        * Sets the alpha (transparency) of the notification
+        * @hide
+        */
+        public static final String NOTIFICATION_ALPHA = "notification_alpha";
+
         /**
          * Pointer speed setting.
          * This is an integer value in a range between -7 and +7, so there are 15 possible values.
