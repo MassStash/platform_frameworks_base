@@ -891,10 +891,14 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mTorchCallback = cb;
         refreshTorchTile();
     }
-    void refreshTorchTile() {
-        Resources r = mContext.getResources();
-        mTorchState.label = r.getString(R.string.quick_settings_torch_label);
-        mTorchCallback.refreshView(mTorchTile, mTorchState);
-    }
 
+    void refreshTorchTile() {
+        if (deviceSupportsLed()) {
+            Resources r = mContext.getResources();
+            mTorchState.label = r.getString(R.string.quick_settings_torch_label);
+            mTorchCallback.refreshView(mTorchTile, mTorchState);
+        } else {
+            return;
+        }
+    }
 }
