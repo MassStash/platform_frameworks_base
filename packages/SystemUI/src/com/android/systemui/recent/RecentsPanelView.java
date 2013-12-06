@@ -32,6 +32,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -92,6 +93,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
+    private ImageView mClearRecents;
+    private int clearAllButton;
 
     public static interface RecentsScrollView {
         public int numItemsInOneScreenful();
@@ -352,6 +355,34 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             if (mPopup != null) {
                 mPopup.dismiss();
             }
+        }
+    }
+
+    private void updateClearButton() {
+        clearAllButton = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.CLEAR_RECENTS_BUTTON, Constants.CLEAR_ALL_BUTTON_BOTTOM_RIGHT);
+
+        if (clearAllButton != Constants.CLEAR_ALL_BUTTON_OFF) {
+            mClearRecents.setVisibility(noApps ? View.GONE : View.VISIBLE);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)mClearRecents.getLayoutParams();
+             switch (clearAllButton) {
+                case Constants.CLEAR_ALL_BUTTON_TOP_LEFT:
+                    layoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_TOP_RIGHT:
+                    layoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT:
+                    layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_BOTTOM_RIGHT:
+                default:
+                    layoutParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+                    break;
+            }
+            mClearRecents.setLayoutParams(layoutParams);
+        } else {
+            mClearRecents.setVisibility(View.GONE);
         }
     }
 
@@ -810,4 +841,38 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         }
         mRecentsContainer.drawFadedEdges(canvas, left, right, top, bottom);
     }
+
+    @Override
+    protected boolean fitSystemWindows(Rect insets) {
+        if (mClearRecents != null) {
+            MarginLayoutParams lp = (MarginLayoutParams) mClearRecents.getLayoutParams();
+            switch (clearAllButton) {
+                case Constants.CLEAR_ALL_BUTTON_TOP_LEFT:
+                    lp.topMargin = insets.top;
+                    lp.leftMargin = insets.left;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_TOP_RIGHT:
+                    lp.topMargin = insets.top;
+                    lp.rightMargin = insets.right;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT:
+                    lp.bottomMargin = insets.bottom;
+                    lp.leftMargin = insets.left;
+                    break;
+                case Constants.CLEAR_ALL_BUTTON_BOTTOM_RIGHT:
+                    lp.bottomMargin = insets.bottom;
+                    lp.rightMargin = insets.right;
+                    break;
+            }
+            mClearRecents.setLayoutParams(lp);
+        }
+
+        return super.fitSystemWindows(insets);
+    }
+
+    class FakeClearUserDataObserver extends IPackageDataObserver.Stub {
+        public void onRemoveCompleted(final String packageName, final boolean succeeded) {
+        }
+    }
+
 }
