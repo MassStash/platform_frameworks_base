@@ -290,6 +290,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private QuickSettingsTileView mBugreportTile;
     private RefreshCallback mBugreportCallback;
     private State mBugreportState = new State();
+	
+    private QuickSettingsTileView mTorchTile;
+    private RefreshCallback mTorchCallback;
+    private State mTorchState = new State();
 
     private QuickSettingsTileView mSettingsTile;
     private RefreshCallback mSettingsCallback;
@@ -868,4 +872,28 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mSslCaCertWarningState.label = r.getString(R.string.ssl_ca_cert_warning);
         mSslCaCertWarningCallback.refreshView(mSslCaCertWarningTile, mSslCaCertWarningState);
     }
+
+    // Torch
+    // show torch tile only on device with flash
+    boolean deviceSupportsLed() {
+        PackageManager pm = mContext.getPackageManager();
+        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+    }
+
+    void addTorchTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mTorchTile = view;
+        mTorchCallback = cb;
+        refreshTorchTile();
+    }
+
+    void refreshTorchTile() {
+        if (deviceSupportsLed()) {
+            Resources r = mContext.getResources();
+            mTorchState.label = r.getString(R.string.quick_settings_torch_label);
+            mTorchCallback.refreshView(mTorchTile, mTorchState);
+        } else {
+            return;
+        }
+    }
+
 }
