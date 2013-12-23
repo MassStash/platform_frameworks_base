@@ -716,7 +716,6 @@ class AlarmManagerService extends IAlarmManager.Stub {
                 if (when != 0) {
                     setLocked(RTC_POWEROFF_WAKEUP, when);
                 }
-                setLocked(RTC_POWEROFF_WAKEUP, firstRtcWakeup.start - SystemClock.elapsedRealtime());
             }
 
         }
