@@ -71,6 +71,7 @@ public class KeyguardStatusView extends GridLayout {
         public void onScreenTurnedOn() {
             setEnableMarquee(true);
             enableRefresh = true;
+            refresh();
         };
 
         @Override
