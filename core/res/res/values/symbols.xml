@@ -1775,9 +1775,6 @@
   <java-symbol type="string" name="second" />
   <java-symbol type="string" name="seconds" />
 
-  <!-- Irda Service -->
-  <java-symbol type="bool" name="config_enableIrdaManagerService" />
-
   <!-- Wifi -->
   <java-symbol type="bool" name="config_wifiApStartInterface" />
   
