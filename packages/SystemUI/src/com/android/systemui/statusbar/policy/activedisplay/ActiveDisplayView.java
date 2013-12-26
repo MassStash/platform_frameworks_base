@@ -218,6 +218,7 @@ public class ActiveDisplayView extends FrameLayout
     private int mInitialBrightness = 0;
     private Set<String> mExcludedApps = new HashSet<String>();
     private Set<String> mPrivacyApps = new HashSet<String>();
+    private boolean mTurnOffModeEnabled = false;
 
     /**
      * Simple class that listens to changes in notifications
@@ -258,6 +259,12 @@ public class ActiveDisplayView extends FrameLayout
                 disableProximitySensor();
                 unlockKeyguardActivity();
                 launchFakeActivityIntent();
+                mNotification = null;
+                hideNotificationView();
+                unlockKeyguardActivity();
+                Intent intent = new Intent(mContext, DummyActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                mContext.startActivityAsUser(intent, new UserHandle(UserHandle.USER_CURRENT));
             } else if (target == OPEN_APP_TARGET) {
                 mIsUnlockByUser = true;
                 disableProximitySensor();
@@ -871,6 +878,64 @@ public class ActiveDisplayView extends FrameLayout
         Log.i(TAG, "ActiveDisplay: disable LightSensor");
         mLightSensorManager.disable(true);
         adjustStatusBarLocked(false);
+
+    private final Runnable runSystemUiVis = new Runnable() {
+        public void run() {
+            mBar.disable(0xffffffff);
+        }
+    };
+
+    private void sendUnlockBroadcast() {
+        Intent u = new Intent();
+        u.setAction("com.android.lockscreen.ACTION_UNLOCK_RECEIVER");
+        mContext.sendBroadcastAsUser(u, UserHandle.ALL);
+    }
+
+    private void disabledKeyguard() {
+        if (mKeyguardLock == null) {
+            mKeyguardLock = mKeyguardManager.newKeyguardLock("active_display");
+            mKeyguardLock.disableKeyguard();
+        }
+    }
+
+    private void enabledKeyguard() {
+        if (mKeyguardLock != null) {
+            mKeyguardLock.reenableKeyguard();
+            mKeyguardLock = null;
+        }
+    }
+
+    private void unlockKeyguardActivity() {
+        if (!mKeyguardManager.isKeyguardSecure()) {
+            sendUnlockBroadcast();
+            try {
+                 // Dismiss the lock screen when Settings starts.
+                 ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
+            } catch (RemoteException e) {
+            }
+        }
+    }
+
+    private static void setSystemUIVisibility(View v, int visibility) {
+        v.setSystemUiVisibility(visibility);
+    }
+
+    private void handleShowNotificationView() {
+        disabledKeyguard();
+        int activeDisplayVis = View.SYSTEM_UI_FLAG_LOW_PROFILE
+                             | View.SYSTEM_UI_FLAG_FULLSCREEN
+                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        setSystemUIVisibility(ActiveDisplayView.this, activeDisplayVis);
+        setVisibility(View.VISIBLE);
+        mHandler.removeCallbacks(runSystemUiVis);
+        mHandler.postDelayed(runSystemUiVis, 100);
+        registerSensorListener(mLightSensor);
+    }
+
+    private void handleHideNotificationView() {
+        mHandler.removeCallbacks(runSystemUiVis);
+        enabledKeyguard();
         setVisibility(View.GONE);
     }
 
@@ -878,11 +943,6 @@ public class ActiveDisplayView extends FrameLayout
         mIsActive = false;
         restoreBrightness();
         mWakedByPocketMode = false;
-
-        // noone is taking care of reenable the bars in this case
-        if (isLockscreenDisabled()) {
-            mBar.disable(0);
-        }
         cancelTimeoutTimer();
         Log.i(TAG, "ActiveDisplay: disable LightSensor");
         mLightSensorManager.disable(true);
@@ -893,6 +953,13 @@ public class ActiveDisplayView extends FrameLayout
         if (!mDisplayNotifications
             || mNotification == null
             || inQuietHoursDim()) return;
+
+        mBar.disable(0);
+        unregisterSensorListener(mLightSensor);
+    }
+
+    private void handleShowNotification(boolean ping) {
+        if (!mDisplayNotifications || mNotification == null) return;
         handleShowNotificationView();
         setActiveNotification(mNotification, true);
         inflateRemoteView(mNotification);
@@ -920,6 +987,9 @@ public class ActiveDisplayView extends FrameLayout
                 invalidate();
                 mGlowPadView.ping();
                 isUserActivity();
+                invalidate();
+                mGlowPadView.ping();
+                userActivity();
                 return;
             }
         }
@@ -1043,6 +1113,19 @@ public class ActiveDisplayView extends FrameLayout
                 wakeDevice();
             }
             KeyguardTouchDelegate.getInstance(mContext).dismiss();
+        }
+    };
+        // to avoid flicker and showing any other screen than the ActiveDisplayView
+        // we use a runnable posted with a 250ms delay to turn wake the device
+        mHandler.removeCallbacks(runWakeDevice);
+        mHandler.postDelayed(runWakeDevice, 250);
+    }
+
+    private final Runnable runWakeDevice = new Runnable() {
+        public void run() {
+            setBrightness(mInitialBrightness);
+            wakeDevice();
+            doTransition(ActiveDisplayView.this, 1f, 1000);
         }
     };
 
@@ -1538,6 +1621,48 @@ public class ActiveDisplayView extends FrameLayout
                 synchronized (ActiveDisplayView.this) {
                     if (mCancelTimeoutSequence == sequence) {
                         turnScreenOffTimeOut();
+    private void updateWakedByPocketMode() {
+        if (mTurnOffModeEnabled && mDisplayNotifications) {
+            mWakedByPocketMode = true;
+            Log.i(TAG, "ActiveDisplay: waked by Pocketmode");
+        }
+    }
+
+    private SensorEventListener mSensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float value = event.values[0];
+            if (event.sensor.equals(mProximitySensor)) {
+                boolean isFar = value >= mProximitySensor.getMaximumRange();
+                if (isFar) {
+                    mProximityIsFar = true;
+                    if (!isScreenOn() && mPocketMode != POCKET_MODE_OFF && !isOnCall() && mDisplayNotifications) {
+                        if (System.currentTimeMillis() >= (mPocketTime + mProximityThreshold) && mPocketTime != 0){
+
+                            if (mNotification == null) {
+                                mNotification = getNextAvailableNotification();
+                            }
+
+                            if (mNotification != null) {
+                                updateWakedByPocketMode();
+                                showNotification(mNotification, true);
+                            } else if (mPocketMode == POCKET_MODE_ALWAYS) {
+                                updateWakedByPocketMode();
+                                showTime();
+                            }
+                        }
+                    }
+                } else {
+                    if (mProximityIsFar) {
+                        mPocketTime = System.currentTimeMillis();
+                        mProximityIsFar = false;
+                    }
+                    if (isScreenOn() && mPocketMode != POCKET_MODE_OFF && !isOnCall() && mWakedByPocketMode) {
+                        mWakedByPocketMode = false;
+                        Log.i(TAG, "ActiveDisplay: sent to sleep by Pocketmode");
+                        restoreBrightness();
+                        cancelTimeoutTimer();
+                        turnScreenOff();
                     }
                 }
             } else if (action.equals(ACTION_PHONE_STATE)) {
