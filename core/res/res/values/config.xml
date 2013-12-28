@@ -1342,7 +1342,7 @@
     <bool name="config_show_cmIMESwitcher">true</bool>
 
     <!-- Device supports LED flashlight -->
-    <bool name="config_enableTorch">false</bool>
+    <bool name="config_enableTorch">true</bool>
 
     <!-- Does the battery LED support multiple colors? Used to decide if the user can change the colors -->
     <bool name="config_multiColorBatteryLed">false</bool>
