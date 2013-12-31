@@ -75,6 +75,24 @@ public class BrightnessDialog extends Dialog implements
 
         setContentView(R.layout.quick_settings_brightness_dialog);
         setCanceledOnTouchOutside(true);
+
+        mSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
+        mSetupButtonDivider = findViewById(R.id.brightness_setup_button_divider);
+        mSetupButton = (ImageView) findViewById(R.id.brightness_setup_button);
+        mSetupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClassName("com.android.settings",
+                        "com.android.settings.carbon.AutoBrightnessSetup");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                getContext().startActivity(intent);
+                dismissBrightnessDialog(0);
+            }
+        });
     }
 
 
