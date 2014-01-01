@@ -1300,7 +1300,9 @@ public class NotificationManagerService extends INotificationManager.Stub
                 }
             } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
                 // turn off LED when user passes through lock screen
-                mNotificationLight.turnOff();
+                if (mLedNotification == null || !isLedNotificationForcedOn(mLedNotification)) {
+                    mNotificationLight.turnOff();
+                }
             } else if (action.equals(Intent.ACTION_USER_SWITCHED)) {
                 // reload per-user settings
                 mSettingsObserver.update(null);
@@ -2359,6 +2361,16 @@ public class NotificationManagerService extends INotificationManager.Stub
         }
     }
 
+    private boolean isLedNotificationForcedOn(NotificationRecord r) {
+        if (r != null) {
+            final Notification n = r.sbn.getNotification();
+            if (n.extras != null) {
+                return n.extras.getBoolean(Notification.EXTRA_FORCE_SHOW_LIGHTS, false);
+            }
+        }
+        return false;
+    }
+
     // lock on mNotificationList
     private void updateLightsLocked()
     {
@@ -2371,10 +2383,19 @@ public class NotificationManagerService extends INotificationManager.Stub
             }
         }
 
+        // Don't flash while we are in a call, screen is on or we are
+        // in quiet hours with light dimmed
+        // (unless Notification has EXTRA_FORCE_SHOW_LGHTS)
+        final boolean enableLed;
+        if (mLedNotification == null) {
+            enableLed = false;
+        } else if (isLedNotificationForcedOn(mLedNotification)) {
+            enableLed = true;
+        } else {
+            enableLed = true;
+        }
 
-        // Don't flash while we are in a call or screen is on or its disabled
-        if (mLedNotification == null || mInCall || mScreenOn || !mNotificationPulseEnabled ||
-            (QuietHoursHelper.inQuietHours(mContext, Settings.System.QUIET_HOURS_DIM))) {
+        if (!enableLed) {
             mNotificationLight.turnOff();
         } else if (mNotificationPulseEnabled) {
             final Notification ledno = mLedNotification.sbn.getNotification();
