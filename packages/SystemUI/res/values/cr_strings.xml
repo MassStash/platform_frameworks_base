@@ -124,17 +124,13 @@
     <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permlab_screenshot">Allows the app to cature a screenshot. This is protected by SystemUI.</string>
     <string name="screenshot_notification_delete">Delete</string>
-<<<<<<< HEAD
-=======
+    <string name="screenshot_delete_confirmation">Screenshot deleted.</string>
     <string name="screenshot_toast">Screenshot in %1$d seconds</string>
 
     <!-- Development shortcut -->
     <string name="advanced_dev_option_wipe_app">Wipe app data</string>
     <string name="advanced_dev_option_force_stop">Force stop</string>
 
-<<<<<<< HEAD
->>>>>>> 149ed7c... Quicksettings tile update WIP
-=======
     <!-- Title of an application permission that lets an application view/edit revoked permissions. -->
     <string name="permlab_revokePermissions">Allows view and edit of revoked permissions. Not for use by normal applications.</string>
     <!-- Description of an application permission that lets lets an application view/edit revoked permissions. -->
@@ -145,5 +141,4 @@
     <!-- Description of an application permission that lets lets an application access the ThemeManagerService -->
     <string name="permdesc_accessThemeService">Allows an application to set/reset themes. Not for use by normal applications.</string>
 
->>>>>>> 1605867... [1/2] Base: Squashed commits for 4.4 active display
 </resources>
