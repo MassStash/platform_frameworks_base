@@ -2970,7 +2970,7 @@ public final class Settings {
          */
         public static final String POWER_MENU_AIRPLANE_ENABLED = "power_menu_airplane_enabled";
 
-        /*
+        /**
          * Display style of the status bar battery information
          * default: 0
          * @hide

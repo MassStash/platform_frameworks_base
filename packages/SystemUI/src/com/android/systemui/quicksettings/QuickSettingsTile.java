@@ -56,6 +56,7 @@ public class QuickSettingsTile implements OnClickListener {
     protected int mTileTextSize;
     protected int mTileTextColor;
     protected int mTileTextPadding;
+    protected boolean mGenericCollapse;
 
     protected PhoneStatusBar mStatusbarService;
     protected QuickSettingsController mQsc;
@@ -67,6 +68,7 @@ public class QuickSettingsTile implements OnClickListener {
 
     public QuickSettingsTile(Context context, QuickSettingsController qsc, int layout) {
         mContext = context;
+        mGenericCollapse = true;
         mDrawable = R.drawable.ic_notifications;
         mLabel = mContext.getString(R.string.quick_settings_label_enabled);
         mStatusbarService = qsc.mStatusBarService;
@@ -163,6 +165,13 @@ public class QuickSettingsTile implements OnClickListener {
     public void onClick(View v) {
         if (mOnClick != null) {
             mOnClick.onClick(v);
+            boolean shouldCollapse = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.QS_COLLAPSE_PANEL, 0, UserHandle.USER_CURRENT) == 1;
+            // mGenericCollapse overrides this method on tiles
+            // where collapsing on click should not be optional
+            if (shouldCollapse && mGenericCollapse) {
+                mQsc.mBar.collapseAllPanels(true);
+            }
         }
     }
 }
