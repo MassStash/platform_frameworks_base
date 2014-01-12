@@ -771,14 +771,14 @@ public class ActiveDisplayView extends FrameLayout
                 }
                 KeyguardTouchDelegate.getInstance(mContext).dismiss();
             }
-            if (mNotification.isClearable()) {
-                try {
+            try {
+                 if (mNotification.isClearable()) {
                      mNM.cancelNotificationFromSystemListener(mNotificationListener,
-                             mNotification.getPackageName(), mNotification.getTag(),
-                             mNotification.getId());
-                } catch (RemoteException e) {
-                } catch (NullPointerException npe) {
-                }
+                         mNotification.getPackageName(), mNotification.getTag(),
+                         mNotification.getId());
+                 }
+            } catch (RemoteException e) {
+            } catch (NullPointerException npe) {
             }
             mNotification = null;
         }
@@ -1019,9 +1019,6 @@ public class ActiveDisplayView extends FrameLayout
             if (mNotification != null) {
                 setActiveNotification(mNotification, true);
                 inflateRemoteView(mNotification);
-                invalidate();
-                mGlowPadView.ping();
-                isUserActivity();
                 invalidate();
                 mGlowPadView.ping();
                 isUserActivity();
@@ -1538,19 +1535,19 @@ public class ActiveDisplayView extends FrameLayout
         } catch (Resources.NotFoundException nfe) {
             mNotificationDrawable = null;
         }
-        if (mNotificationDrawable != null) {
-            post(new Runnable() {
-                 @Override
-                 public void run() {
+        post(new Runnable() {
+             @Override
+             public void run() {
+                 if (mNotificationDrawable != null) {
                      mCurrentNotificationIcon.setImageDrawable(mNotificationDrawable);
                      setHandleText(sbn);
                      mNotification = sbn;
-                     updateResources();
-                     mGlowPadView.invalidate();
-                     if (updateOthers) updateOtherNotifications();
                  }
-            });
-        }
+                 updateResources();
+                 mGlowPadView.invalidate();
+                 if (updateOthers) updateOtherNotifications();
+             }
+        });
     }
 
     /**
