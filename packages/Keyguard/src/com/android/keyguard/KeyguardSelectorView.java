@@ -78,8 +78,9 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private static final String ASSIST_ICON_METADATA_NAME =
         "com.android.systemui.action_assist_icon";
 
-    private Handler mHandler = new Handler();
     private float mBatteryLevel;
+
+    private Handler mHandler = new Handler();
     private KeyguardSecurityCallback mCallback;
     private GlowPadView mGlowPadView;
     private KeyguardShortcuts mShortcuts;
