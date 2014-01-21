@@ -3369,6 +3369,12 @@ public final class Settings {
         public static final String POWER_SOUNDS_ENABLED = Global.POWER_SOUNDS_ENABLED;
 
         /**
+         * Whether power menu expanded desktop is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_EXPANDED_DESKTOP_ENABLED = "power_menu_expanded_desktop_enabled";
+
+        /**
          * @deprecated Use {@link android.provider.Settings.Global#DOCK_SOUNDS_ENABLED}
          * instead
          * @hide
@@ -3617,14 +3623,16 @@ public final class Settings {
         public static final String EXPANDED_FLASH_MODE = "expanded_flash_mode";
 
         /**
-         * Immersive mode global actions switch
-         * 0 = no
-         * 1 = yes
-         * 2 = hide navbar
-         * 3 = hide statusbar
+         * Expanded desktop on/off state
          * @hide
          */
-        public static final String IMMERSIVE_MODE = "immersive_mode";
+        public static final String EXPANDED_DESKTOP_STATE = "expanded_desktop_state";
+
+        /**
+         * Expanded desktop style (with status bar or without status bar)
+         * @hide
+         */
+        public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
 
         /**
          * Show or hide clock
