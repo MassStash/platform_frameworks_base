@@ -341,6 +341,7 @@ public class ActiveDisplayView extends FrameLayout
                     Settings.System.ACTIVE_DISPLAY_CONTENT), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ACTIVE_DISPLAY_BYPASS), false, this);
+                    Settings.System.EXPANDED_DESKTOP_STATE), false, this);
             update();
         }
 
@@ -403,6 +404,34 @@ public class ActiveDisplayView extends FrameLayout
             mBypassActiveDisplay = Settings.System.getIntForUser(
                     resolver, Settings.System.ACTIVE_DISPLAY_BYPASS, 1,
                     UserHandle.USER_CURRENT_OR_SELF) != 0;
+            ContentResolver resolver =
+                    ActiveDisplayView.this.mContext.getContentResolver();
+            mDisplayNotifications = Settings.System.getInt(
+                    resolver, Settings.System.ENABLE_ACTIVE_DISPLAY, 0) == 1;
+            mDisplayNotificationText = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_TEXT, 0) == 1;
+            mShowAllNotifications = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_ALL_NOTIFICATIONS, 0) == 1;
+            mHideLowPriorityNotifications = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_HIDE_LOW_PRIORITY_NOTIFICATIONS, 0) == 1;
+            mPocketMode = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_POCKET_MODE, POCKET_MODE_OFF);
+            mRedisplayTimeout = Settings.System.getLong(
+                    resolver, Settings.System.ACTIVE_DISPLAY_REDISPLAY, 0L);
+            mInitialBrightness = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_BRIGHTNESS, 100) / 100f;
+            mSunlightModeEnabled = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_SUNLIGHT_MODE, 0) == 1;
+            String excludedApps = Settings.System.getString(resolver,
+                    Settings.System.ACTIVE_DISPLAY_EXCLUDED_APPS);
+            mDisplayTimeout = Settings.System.getLong(
+                    resolver, Settings.System.ACTIVE_DISPLAY_TIMEOUT, 8000L);
+            mTurnOffModeEnabled = Settings.System.getInt(
+                    resolver, Settings.System.ACTIVE_DISPLAY_TURNOFF_MODE, 0) == 1;
+            mProximityThreshold = Settings.System.getLong(
+                    resolver, Settings.System.ACTIVE_DISPLAY_THRESHOLD, 8000L);
+            mForceImmersiveMode = Settings.System.getInt(
+                    resolver, Settings.System.EXPANDED_DESKTOP_STATE, 0) == 1;
 
             createExcludedAppsSet(excludedApps);
             createPrivacyAppsSet(privacyApps);
