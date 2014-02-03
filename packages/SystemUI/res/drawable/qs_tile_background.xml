@@ -19,10 +19,10 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 <<<<<<< HEAD
     <item android:state_pressed="true">
-	<color android:color="#212121" />
+	<color android:color="@color/qs_background_pressed_color" />
     </item>
     <item>
-        <color android:color="#161616" />
+        <color android:color="@color/qs_background_color" />
     </item>
 =======
     <item android:state_pressed="true" android:drawable="@drawable/qs_tile_background_p" />
