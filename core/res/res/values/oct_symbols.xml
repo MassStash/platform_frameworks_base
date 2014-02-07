@@ -46,4 +46,7 @@
   <java-symbol type="color" name="holo_green_dark" />
   <java-symbol type="color" name="holo_purple_dark" />
   <java-symbol type="color" name="holo_red_dark" />
+  
+  <!-- OctOS Easter Egg -->
+  <java-symbol type="drawable" name="oct_logo" />
 </resources>
