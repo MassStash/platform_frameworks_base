@@ -289,7 +289,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         // next: reboot
         // only shown if enabled, enabled by default
         boolean showReboot = Settings.System.getIntForUser(cr,
-                Settings.System.POWER_MENU_REBOOT_ENABLED, 1, UserHandle.USER_CURRENT) == 1;
+                Settings.System.POWER_MENU_REBOOT_ENABLED, 0, UserHandle.USER_CURRENT) == 1;
         if (showReboot) {
             mItems.add(
                 new SinglePressAction(R.drawable.ic_lock_reboot, R.string.global_action_reboot) {
