@@ -287,7 +287,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     VelocityTracker mVelocityTracker;
 
     int[] mAbsPos = new int[2];
-    Runnable mPostCollapseCleanup = null;
     
     // last theme that was applied in order to detect theme change (as opposed
     // to some other configuration change).
@@ -357,7 +356,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     };
 
     // status bar brightness control
-    Runnable mLongPressBrightnessChange = new Runnable() {
+    private final Runnable mLongPressBrightnessChange = new Runnable() {
         @Override
         public void run() {
             mStatusBarView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
