@@ -2646,6 +2646,13 @@ public final class Settings {
          * @hide
          */
         public static final String QS_DYNAMIC_WIFI = "qs_dyanmic_wifi";
+		
+		/**
+		 *
+		 * SMOOTH PROGRESS BAR interpolator
+		 * @hide
+		 */
+        public static final String PROGRESSBAR_INTERPOLATOR = "progressbar_interpolator";
 
 		/**
 		 *
@@ -2800,7 +2807,7 @@ public final class Settings {
         * @hide
         */
         public static final String EXPANDED_RING_MODE = "expanded_ring_mode";
-		
+
         /**
          * Enable looking up of phone numbers of nearby places
          *
