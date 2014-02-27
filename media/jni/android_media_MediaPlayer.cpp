@@ -807,6 +807,38 @@ android_media_MediaPlayer_setNextMediaPlayer(JNIEnv *env, jobject thiz, jobject 
     ;
 }
 
+static jboolean
+android_media_MediaPlayer_suspend(JNIEnv *env, jobject thiz)
+{
+    sp<MediaPlayer> mp = getMediaPlayer(env, thiz);
+    if (mp == NULL) {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return false;
+    }
+
+    if (mp->suspend() != OK) {
+        return false;
+    }
+
+    return true;
+}
+
+static jboolean
+android_media_MediaPlayer_resume(JNIEnv *env, jobject thiz)
+{
+    sp<MediaPlayer> mp = getMediaPlayer(env, thiz);
+    if (mp == NULL) {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return false;
+    }
+
+    if (mp->resume() != OK) {
+        return false;
+    }
+
+    return true;
+}
+
 static void
 android_media_MediaPlayer_updateProxyConfig(
         JNIEnv *env, jobject thiz, jobject proxyProps)
