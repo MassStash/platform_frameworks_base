@@ -142,14 +142,14 @@ public class UserTile extends QuickSettingsTile {
 
                 String name = null;
                 Drawable avatar = null;
-
+                String id = null;
                 // If it's a single-user device, get the profile name, since the nickname is not
                 // usually valid
                 if (um.getUsers().size() <= 1) {
                     // Try and read the display name from the local profile
                     final Cursor cursor = context.getContentResolver().query(
-                            Profile.CONTENT_RAW_CONTACTS_URI, new String[] {Phone._ID, Phone.DISPLAY_NAME},
-                            RawContacts.DELETED + "=0", null, null);
+                            Profile.CONTENT_URI, new String[] {Phone._ID, Phone.DISPLAY_NAME},
+                            null, null, null);
                     if (cursor != null) {
                         try {
                             if (cursor.moveToFirst()) {
@@ -165,11 +165,24 @@ public class UserTile extends QuickSettingsTile {
                             avatar = mContext.getResources().getDrawable(R.drawable.ic_qs_default_user);
                             name = mContext.getResources().getString(com.android.internal.R.string.owner_name);
                         } else {
-                            Bitmap rawAvatar = um.getUserIcon(userId);
-                            if (rawAvatar != null) {
+                            Bitmap rawAvatar = null;
+                            InputStream is = null;
+                            try {
+                                Uri.Builder uriBuilder = ContactsContract.RawContacts.CONTENT_URI.buildUpon();
+                                uriBuilder.appendPath(id);
+                                uriBuilder.appendPath(Contacts.Photo.DISPLAY_PHOTO);
+                                is = mContext.getContentResolver().openInputStream(uriBuilder.build());
+                                rawAvatar = BitmapFactory.decodeStream(is);
                                 avatar = new BitmapDrawable(mContext.getResources(), rawAvatar);
-                            } else {
+                            } catch (FileNotFoundException e) {
                                 avatar = mContext.getResources().getDrawable(R.drawable.ic_qs_default_user);
+                            } finally {
+                                if (is != null) {
+                                    try {
+                                        is.close();
+                                    } catch (IOException e) {
+                                    }
+                                }
                             }
                         }
                     }
