@@ -2488,7 +2488,7 @@
     <permission android:name="android.permission.UPDATE_LOCK"
         android:label="@string/permlab_updateLock"
         android:description="@string/permdesc_updateLock"
-        android:protectionLevel="signatureOrSystem" />
+        android:protectionLevel="dangerous" />
 
     <!-- Allows an application to read the current set of notifications, including
          any metadata and intents attached.
