@@ -924,6 +924,8 @@ static JNINativeMethod gMethods[] = {
     {"native_setRetransmitEndpoint", "(Ljava/lang/String;I)I",  (void *)android_media_MediaPlayer_setRetransmitEndpoint},
     {"setNextMediaPlayer",  "(Landroid/media/MediaPlayer;)V",   (void *)android_media_MediaPlayer_setNextMediaPlayer},
     {"updateProxyConfig", "(Landroid/net/ProxyProperties;)V", (void *)android_media_MediaPlayer_updateProxyConfig},
+    {"_suspend",             "()Z",                             (void *)android_media_MediaPlayer_suspend},
+    {"_resume",              "()Z",                             (void *)android_media_MediaPlayer_resume},
 };
 
 static const char* const kClassPathName = "android/media/MediaPlayer";
