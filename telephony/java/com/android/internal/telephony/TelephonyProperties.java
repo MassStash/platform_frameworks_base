@@ -198,4 +198,9 @@ public interface TelephonyProperties
      * Type: boolean ( true = alpha display enabled, false = alpha display disabled)
      */
     static final String PROPERTY_ALPHA_USRCNF = "persist.atel.noalpha.usrcnf";
+
+    /**
+     * Set to true to indicates support for simultaneous voice and EvDo.
+     */
+    static final String PROPERTY_SVDO = "ro.ril.svdo";
 }
