@@ -985,6 +985,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 Settings.System.NOTIFICATION_SHORTCUTS_HIDE_CARRIER, 0, UserHandle.USER_CURRENT) != 0;
         mCarrierAndWifiView = mStatusBarWindow.findViewById(R.id.carrier_wifi);
         mWifiView = mStatusBarWindow.findViewById(R.id.wifi_view);
+        mSignalClusterView = (SignalClusterView) mStatusBarView.findViewById(R.id.signal_cluster);
+        mNetworkController.addSignalCluster(mSignalClusterView);
+        mSignalClusterView.setNetworkController(mNetworkController);
 
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             mMSimNetworkController = new MSimNetworkController(mContext);
@@ -1046,6 +1049,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mNetworkController.addNetworkSignalChangedCallback(mSignalTextView);
             mNetworkController.addSignalStrengthChangedCallback(mSignalTextView);
             mSignalClusterView.setNetworkController(mNetworkController);
+            final SignalClusterView signalCluster =
+                    (SignalClusterView) mStatusBarView.findViewById(R.id.signal_cluster);
+
+            mNetworkController.addSignalCluster(signalCluster);
+            signalCluster.setNetworkController(mNetworkController);
 
             final boolean isAPhone = mNetworkController.hasVoiceCallingFeature();
             if (isAPhone) {
