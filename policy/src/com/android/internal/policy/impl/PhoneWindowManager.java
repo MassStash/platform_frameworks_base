@@ -194,12 +194,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_MASK_ASSIST = 0x08;
     private static final int KEY_MASK_APP_SWITCH = 0x10;
 
-    // constants for rotation bits
-    private static final int ROTATION_0_MODE = 1;
-    private static final int ROTATION_90_MODE = 2;
-    private static final int ROTATION_180_MODE = 4;
-    private static final int ROTATION_270_MODE = 8;
-
     /**
      * These are the system UI flags that, when changing, can cause the layout
      * of the screen to change.
@@ -324,7 +318,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     int mUserRotationMode = WindowManagerPolicy.USER_ROTATION_FREE;
     int mUserRotation = Surface.ROTATION_0;
-    int mUserRotationAngles = -1;
     boolean mAccelerometerDefault;
 
     int mAllowAllRotations = -1;
@@ -645,9 +638,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.KEY_APP_SWITCH_LONG_PRESS_ACTION), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HARDWARE_KEY_REBINDING), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ACCELEROMETER_ROTATION_ANGLES), false, this,
-                    UserHandle.USER_ALL);
             updateSettings();
         }
 
@@ -1490,10 +1480,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateRotation = true;
                 updateOrientationListenerLp();
             }
-
-            mUserRotationAngles = Settings.System.getIntForUser(resolver,
-                    Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1,
-                    UserHandle.USER_CURRENT);
 
             if (mSystemReady) {
                 int pointerLocation = Settings.System.getIntForUser(resolver,
@@ -5057,30 +5043,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mAllowAllRotations = mContext.getResources().getBoolean(
                             com.android.internal.R.bool.config_allowAllRotations) ? 1 : 0;
                 }
-                // Rotation setting bitmask
-                // 1=0 2=90 4=180 8=270
-                if (mUserRotationAngles < 0) {
-                    // defaults
-                    mUserRotationAngles = mAllowAllRotations == 1 ?
-                            (ROTATION_0_MODE | ROTATION_90_MODE | ROTATION_180_MODE | ROTATION_270_MODE) : // All angles
-                            (ROTATION_0_MODE | ROTATION_90_MODE | ROTATION_270_MODE); // All except 180
-                }
-                boolean allowed = true;
-                switch (sensorRotation) {
-                    case Surface.ROTATION_0:
-                        allowed = (mUserRotationAngles & ROTATION_0_MODE) != 0;
-                        break;
-                    case Surface.ROTATION_90:
-                        allowed = (mUserRotationAngles & ROTATION_90_MODE) != 0;
-                        break;
-                    case Surface.ROTATION_180:
-                        allowed = (mUserRotationAngles & ROTATION_180_MODE) != 0;
-                        break;
-                    case Surface.ROTATION_270:
-                        allowed = (mUserRotationAngles & ROTATION_270_MODE) != 0;
-                        break;
-                }
-                if (allowed) {
+                if (sensorRotation != Surface.ROTATION_180
+                        || mAllowAllRotations == 1
+                        || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+                        || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_USER) {
                     preferredRotation = sensorRotation;
                 } else {
                     preferredRotation = lastRotation;
