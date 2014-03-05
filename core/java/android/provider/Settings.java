@@ -3180,13 +3180,7 @@ public final class Settings {
         public static final String QUIET_HOURS_RINGER = "quiet_hours_ringer";
 
         /**
-         * use Active display content view instead default one.
-         * @hide
-         */
-        public static final String ACTIVE_DISPLAY_CONTENT = "active_display_content";
-
-        /**
-         *  Enable statusbar double tap gesture on to put device to sleep
+		 *  Enable statusbar double tap gesture on to put device to sleep
          * @hide
          */
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
@@ -3305,20 +3299,6 @@ public final class Settings {
          * @hide
          */
         public static final String BATTERY_AROUND_LOCKSCREEN_RING = "battery_around_lockscreen_ring";
-
-        /**
-         * A list of packages to exclude from being message displayed in active display.
-         * This should be a string of packages separated by |
-         * @hide
-         */
-        public static final String ACTIVE_DISPLAY_PRIVACY_APPS = "active_display_privacy_apps";
-
-        /**
-         * allow bypass active display when lockscreen isSecure
-         * and there is no notifications
-         * @hide
-         */
-        public static final String ACTIVE_DISPLAY_BYPASS = "active_display_bypass";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
