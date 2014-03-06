@@ -3402,6 +3402,12 @@ public final class Settings {
         public static final String ADB_ENABLED = Global.ADB_ENABLED;
 
         /**
+         * The hostname for this device
+         * @hide
+         */
+        public static final String DEVICE_HOSTNAME = "device_hostname";
+
+        /**
          * @deprecated Use {@link android.provider.Settings.Secure#ANDROID_ID} instead
          */
         @Deprecated
