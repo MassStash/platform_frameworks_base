@@ -196,6 +196,9 @@ public class ActiveDisplayView extends FrameLayout
     private boolean mIsInBrightLight = false;
     private boolean mWakedByPocketMode = false;
     private boolean mIsScreenOff = false;
+    private long mPocketTime = 0;
+    private long mTurnOffTime = 0;
+    private long mTurnOffTimeThreshold = 200L;
     private boolean mCallbacksRegistered = false;
     private long mPocketTime = 0;
     private int mCancelRedisplaySequence;
@@ -1181,6 +1184,7 @@ public class ActiveDisplayView extends FrameLayout
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
         mContext.registerReceiver(mBroadcastReceiver, filter);
     }
 
@@ -1497,13 +1501,18 @@ public class ActiveDisplayView extends FrameLayout
      */
     private void setActiveNotification(final StatusBarNotification sbn, final boolean updateOthers) {
         mNotificationDrawable = getIconDrawable(sbn);
+        final Drawable drawable = mNotificationDrawable;
         final NotificationData nd = NotificationUtils.getNotificationData(mContext, sbn);
         post(new Runnable() {
              @Override
              public void run() {
-                 if (mNotificationDrawable != null) {
-                     mCurrentNotificationIcon.setImageDrawable(mNotificationDrawable);
-                     mCurrentNotificationIcon.placeNumber(nd.number, mShowNotificationCount);
+                 if (drawable != null) {
+                     mCurrentNotificationIcon.setImageDrawable(drawable);
+                     if (nd != null) {
+                         mCurrentNotificationIcon.placeNumber(nd.number, mShowNotificationCount);
+                     } else {
+                         mCurrentNotificationIcon.placeNumber(0, false);
+                     }
                      setHandleText(sbn);
                      mNotification = sbn;
                  } else {
@@ -1687,12 +1696,12 @@ public class ActiveDisplayView extends FrameLayout
                 onScreenTurnedOff();
             } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 onScreenTurnedOn();
+            } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
+                if (!isLockScreenDisabled()) {
+                    cancelAllState();
+                }
             } else if (action.equals(ACTION_UNLOCK_DEVICE)) {
-                cancelAllTimer();
-                setUserActivity();
-                restoreBrightness();
-                disableProximitySensor();
-                mWakedByPocketMode = false;
+                cancelAllState();
                 if (mIsUnlockByUser) {
                     mIsUnlockByUser = false;
                     if (!isScreenOn()) {
