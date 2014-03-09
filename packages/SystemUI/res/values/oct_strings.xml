@@ -156,4 +156,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+    <string name="pie_date_format">ccc, dd MMM yyyy</string>
+    <string name="pie_hour_format_12">hh:mm</string>
+    <string name="pie_hour_format_24">HH:mm</string>
+
 </resources>
