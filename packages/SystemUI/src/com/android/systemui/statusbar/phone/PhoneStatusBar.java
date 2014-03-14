@@ -1209,8 +1209,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mVelocityTracker = VelocityTracker.obtain();
 
-        mNetworkController.setListener(this);
-
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             mMSimNetworkController.setListener(this);
         } else {
