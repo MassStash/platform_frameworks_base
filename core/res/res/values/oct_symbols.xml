@@ -56,8 +56,4 @@
 
   <!-- Hardware Key ReMapping -->
   <java-symbol type="integer" name="config_deviceHardwareKeys" />
-  
-  <!-- Hardware Key ReMapping -->
-  <java-symbol type="bool" name="config_singleStageCameraKey" />
-  
 </resources>
