@@ -1367,9 +1367,4 @@
          kill the foreground app. -->
     <integer name="config_backKillTimeout">2000</integer>
 
-    <!-- Indicates that the device has Single-stage Camera key
-         (without "Focus" state) instead of Dual-stage. -->
-    <bool name="config_singleStageCameraKey">false</bool>
-
-
 </resources>

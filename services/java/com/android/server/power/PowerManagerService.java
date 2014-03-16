@@ -185,9 +185,6 @@ public final class PowerManagerService extends IPowerManager.Stub
     private DreamManagerService mDreamManager;
     private LightsService.Light mAttentionLight;
     private LightsService.Light mButtonsLight;
-    private LightsService.Light mKeyboardLight;
-    private LightsService.Light mCapsLight;
-    private LightsService.Light mFnLight;
 
     private int mButtonTimeout;
     private int mButtonBrightness;
@@ -360,11 +357,6 @@ public final class PowerManagerService extends IPowerManager.Stub
     // to allow the current foreground activity to override the brightness.
     // Use -1 to disable.
     private int mScreenBrightnessOverrideFromWindowManager = -1;
-    
-    // The button brightness setting override from the window manager
-    // to allow the current foreground activity to override the button brightness.
-    // Use -1 to disable.
-    private int mButtonBrightnessOverrideFromWindowManager = -1;
 
     // The user activity timeout override from the window manager
     // to allow the current foreground activity to override the user activity timeout.
@@ -395,7 +387,6 @@ public final class PowerManagerService extends IPowerManager.Stub
     private static native void nativeReleaseSuspendBlocker(String name);
     private static native void nativeSetInteractive(boolean enable);
     private static native void nativeSetAutoSuspend(boolean enable);
-    private boolean mKeyboardVisible = false;
 
     public PowerManagerService() {
         synchronized (mLock) {
@@ -482,9 +473,6 @@ public final class PowerManagerService extends IPowerManager.Stub
             mSettingsObserver = new SettingsObserver(mHandler);
             mAttentionLight = mLightsService.getLight(LightsService.LIGHT_ID_ATTENTION);
             mButtonsLight = mLightsService.getLight(LightsService.LIGHT_ID_BUTTONS);
-            mKeyboardLight = mLightsService.getLight(LightsService.LIGHT_ID_KEYBOARD);
-            mCapsLight = mLightsService.getLight(LightsService.LIGHT_ID_CAPS);
-            mFnLight = mLightsService.getLight(LightsService.LIGHT_ID_FUNC);
 
             // Register for broadcasts from other components of the system.
             IntentFilter filter = new IntentFilter();
@@ -1043,42 +1031,6 @@ public final class PowerManagerService extends IPowerManager.Stub
             }
         }
         return false;
-    }
-    
-   @Override // Binder call
-    public void setKeyboardVisibility(boolean visible) {
-        synchronized (mLock) {
-            if (DEBUG_SPEW) {
-                Slog.d(TAG, "setKeyboardVisibility: " + visible);
-            }
-            if (mKeyboardVisible != visible) {
-                mKeyboardVisible = visible;
-                if (!visible) {
-                    // If hiding keyboard, turn off leds
-                    setKeyboardLight(false, 1);
-                    setKeyboardLight(false, 2);
-                }
-                synchronized (mLock) {
-                    mDirty |= DIRTY_USER_ACTIVITY;
-                    updatePowerStateLocked();
-                }
-            }
-        }
-    }
-    
-    @Override // Binder call
-    public void setKeyboardLight(boolean on, int key) {
-        if (key == 1) {
-            if (on)
-                mCapsLight.setColor(0x00ffffff);
-            else
-                mCapsLight.turnOff();
-        } else if (key == 2) {
-            if (on)
-                mFnLight.setColor(0x00ffffff);
-            else
-                mFnLight.turnOff();
-        }
     }
 
     @Override // Binder call
