@@ -3119,13 +3119,6 @@ public final class Settings {
          */
         public static final String SCREEN_RECORDER_BITRATE = "screen_recorder_bitrate";
 
-        /*
-         * Navigation bar customization
-         *
-         * @hide
-         */
-        public static final String NAV_BUTTONS = "nav_buttons";
-
         /**
         * Whether to control brightness from status bar
         *
