@@ -161,6 +161,7 @@ public class UserTile extends QuickSettingsTile {
                 String name = null;
                 Drawable avatar = null;
                 String id = null;
+
                 // If it's a single-user device, get the profile name, since the nickname is not
                 // usually valid
                 if (um.getUsers().size() <= 1) {
@@ -168,6 +169,7 @@ public class UserTile extends QuickSettingsTile {
                     final Cursor cursor = context.getContentResolver().query(
                             Profile.CONTENT_URI, new String[] {Phone.PHOTO_FILE_ID, Phone.DISPLAY_NAME},
                             null, null, null);
+
                     if (cursor != null) {
                         try {
                             if (cursor.moveToFirst()) {

@@ -111,7 +111,4 @@
 
     <!--ScreenShot Trash-->
     <string name="screenshot_notification_delete">Delete</string>
-
-    <!-- Active Display -->
-    <string name="active_display_privacy_content">Content message not showing because privacy mode enabled</string>
 </resources>
