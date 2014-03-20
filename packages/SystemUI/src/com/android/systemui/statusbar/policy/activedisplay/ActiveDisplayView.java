@@ -344,7 +344,6 @@ public class ActiveDisplayView extends FrameLayout
                     Settings.System.ACTIVE_DISPLAY_CONTENT), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ACTIVE_DISPLAY_BYPASS), false, this);
-                    Settings.System.EXPANDED_DESKTOP_STATE), false, this);
             update();
         }
 
