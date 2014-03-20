@@ -510,7 +510,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (mCarrierLabel != null) {
                 toggleCarrierAndWifiLabelVisibility();
           }
-       }
 
             int signalStyle = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUS_BAR_SIGNAL_TEXT,
