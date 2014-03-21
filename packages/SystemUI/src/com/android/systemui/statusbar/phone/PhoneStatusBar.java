@@ -278,7 +278,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     FrameLayout.LayoutParams lpCarrierLabel;
 
     private SignalClusterView mSignalClusterView;
-    private MSimSignalClusterView mMSimSignalClusterView;
     private SignalClusterTextView mSignalTextView;
 
     // position
@@ -424,9 +423,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_CIRCLE_BATTERY_ANIMATIONSPEED),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NOTIFICATION_SHORTCUTS_HIDE_CARRIER),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_BUTTON_TINT),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -514,12 +510,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             int signalStyle = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUS_BAR_SIGNAL_TEXT,
                     SignalClusterView.STYLE_NORMAL, mCurrentUserId);
-            if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
-                mMSimSignalClusterView.setStyle(signalStyle);
-            } else {
                 mSignalClusterView.setStyle(signalStyle);
                 mSignalTextView.setStyle(signalStyle);
-            }
         }
     }
 
