@@ -7,7 +7,6 @@
   <!-- Immersive Global Action -->
   <java-symbol type="drawable" name="ic_lock_expanded_desktop" />
   <java-symbol type="drawable" name="ic_lock_expanded_desktop_off" />
-  <java-symbol type="string" name="global_actions_toggle_expanded_desktop_mode" />
   <java-symbol type="string" name="global_actions_expanded_desktop_mode_off_status" />
   <java-symbol type="string" name="global_actions_expanded_desktop_mode_on_status" />
 
@@ -63,7 +62,6 @@
 
   <!-- Wifi -->
   <java-symbol type="bool" name="config_wifiApStartInterface" />
-  <java-symbol type="bool" name="config_wifiApFirmwareReload" />
 
   <!-- Privacy Guard -->
   <java-symbol type="string" name="privacy_guard_notification" />
@@ -72,11 +70,6 @@
 
   <!-- LED flashlight -->
   <java-symbol type="bool" name="config_enableTorch" />
-
-  <!-- EdgeGesture service -->
-  <java-symbol type="dimen" name="edge_gesture_trigger_distance" />
-  <java-symbol type="dimen" name="edge_gesture_perpendicular_distance" />
-  <java-symbol type="dimen" name="edge_gesture_trigger_thickness" />
 
   <!-- Expanded desktop -->
   <java-symbol type="string" name="global_actions_expanded_desktop_mode_on_status" />
