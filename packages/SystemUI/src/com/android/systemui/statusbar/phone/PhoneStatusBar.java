@@ -463,8 +463,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.EXPANDED_DESKTOP_STATE), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_SIGNAL_TEXT), false, this);
+/*            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_SIGNAL_TEXT), false, this);   */
             update();
         }
 
@@ -540,7 +540,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 toggleCarrierAndWifiLabelVisibility();
           }
 
-            int signalStyle = Settings.System.getIntForUser(resolver,
+           int signalStyle = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUS_BAR_SIGNAL_TEXT,
                     SignalClusterView.STYLE_NORMAL, mCurrentUserId);
                 mSignalClusterView.setStyle(signalStyle);
